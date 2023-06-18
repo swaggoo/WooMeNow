@@ -6,6 +6,7 @@ using WooMeNow.API.Interfaces;
 using WooMeNow.API.Services;
 using System.Text;
 using WooMeNow.API.Extensions;
+using WooMeNow.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddIdentityServices(builder.Configuration);
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(policyBuilder =>
 {
     policyBuilder.AllowAnyHeader()
@@ -29,13 +31,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 
