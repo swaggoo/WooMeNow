@@ -1,31 +1,35 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WooMeNow.API.Data;
+using WooMeNow.API.Data.Repository;
 using WooMeNow.API.Models;
+using WooMeNow.API.Models.DTOs;
 
 namespace WooMeNow.API.Controllers;
 
+[Authorize]
 public class UsersController : BaseApiController
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
 
-    public UsersController(ApplicationDbContext db)
+    public UsersController(IUserRepository userRepository, IMapper mapper)
     {
-        _db = db;
+        _userRepository = userRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
     {
-        return await _db.Users.ToListAsync();
+        return Ok(await _userRepository.GetMembersAsync());
     }
-     
-    [HttpGet]
-    [Route("{id}")]
-    [Authorize]
-    public async Task<ActionResult<User>> GetUser(int id)
+
+    [HttpGet("{username}")]
+    public async Task<ActionResult<MemberDto>> GetUser(string username)
     {
-        return await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return Ok(await _userRepository.GetMemberAsync(username));
     }
 }
