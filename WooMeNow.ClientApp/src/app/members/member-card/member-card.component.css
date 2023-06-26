@@ -1,0 +1,41 @@
+.card:hover img {
+    transform: scale(1.2, 1.2);
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+    opacity: 0.7;
+}
+
+.card img {
+    transform: scale(1.0, 1.0);
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+}
+
+.card-img-wrapper {
+    overflow: hidden;
+    position: relative;
+}
+
+.member-icons {
+    position: absolute;
+    bottom: -30%;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0;
+}
+
+.member-icons button {
+    padding: 5px 10px; /* Adjust the padding to make the background of the icons smaller */
+    margin: 5px 5px; /* Adjust the margin to add space between icons */
+}
+
+.card-img-wrapper:hover .member-icons {
+    bottom: 0;
+    opacity: 1;
+}
+
+.animate {
+    transition: all 0.2s ease-in-out;
+}
