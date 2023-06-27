@@ -23,7 +23,7 @@
                 Welcome <strong>{{user.username | titlecase}}</strong>
             </a>
             <div class="dropdown-menu mt-3" *dropdownMenu>
-                <a class="dropdown-item">Edit Profile</a>
+                <a routerLink="/member/edit" class="dropdown-item">Edit Profile</a>
                 <li class="divider dropdown-divider"></li>
                 <a class="dropdown-item" (click)="logout()">Logout</a>
             </div>
@@ -31,7 +31,7 @@
       
         <form *ngIf="!(accountService.currentUser$| async)" #loginForm="ngForm" class="d-flex" (ngSubmit)="login()" autocomplete="off">
           <input
-          name="username" 
+          name="username"
           [(ngModel)]="model.username" 
           class="form-control me-2" 
           type="text" 

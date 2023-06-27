@@ -1,0 +1,98 @@
+<div class="row" *ngIf="member">
+    <div class="col-4">
+        <h1>Your profile</h1>
+    </div>
+    <div class="col-8 p-0">
+        <div class="alert alert-info" *ngIf="editForm.dirty">
+            <strong>Information: </strong>You have made changes. Any unsaved changes will be lost
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card">
+            <img src="{{member.photoUrl || './assets/user.jpg'}}" alt="{{member.knownAs}}" 
+            class="card-img-top img-thumbnail">
+        <div class="card-body">
+            <div>
+                <strong>Location:</strong>
+                <p>{{member.city}}, {{member.country}}</p>
+            </div>
+            <div>
+                <strong>Age:</strong>
+                <p>{{member.age}}</p>
+            </div>
+            <div>
+                <strong>Last active:</strong>
+                <p>{{member.lastActive}}</p>
+            </div>
+            <div>
+                <strong>Member since:</strong>
+                <p>{{member.created}}</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" [disabled]="!editForm.dirty" form="editForm" class="btn btn-primary col-12">Save changes</button>
+        </div>
+        </div>
+    </div>
+
+    <div class="col-8">
+        <tabset class="member-tabset">
+            <tab  heading="About {{member.knownAs}}">
+                <form #editForm="ngForm" id="editForm" (ngSubmit)="updateMember()">
+                    <div class="card text-white bg-secondary mb-3" style="max-width: 65rem; padding: 10px 5px 20px 5px;">
+                        <div class="card-body">
+                            <h4>Description</h4>
+                            <div class="form-group">
+                                <textarea
+                                    class="form-control" 
+                                    rows="5"
+                                    [(ngModel)]="member.introduction" 
+                                    name="introduction">
+                                </textarea>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Looking for</h4>
+                            <div class="form-group">
+                                <textarea
+                                    class="form-control"
+                                    rows="5"
+                                    [(ngModel)]="member.lookingFor" 
+                                    name="lookingFor">
+                                </textarea>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Interests</h4>
+                            <div class="form-group">
+                                <textarea
+                                    class="form-control"
+                                    rows="3"
+                                    [(ngModel)]="member.interests"
+                                    name="interests">
+                                </textarea>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Location Details</h4>
+                            <div class="d-flex flex-row align-items-center">
+                                <label for="city" class="mx-2">City: </label>
+                                <div class="form-group">
+                                    <input type="text" [(ngModel)]="member.city" name="city" class="form-control">
+                                </div>
+                                <label for="country" class="mx-2">Country: </label>
+                                <div class="form-group">
+                                    <input type="text" [(ngModel)]="member.country" name="country" class="form-control">
+                                </div>
+                            </div>
+                            
+                        </div>
+                      </div>
+                </form>
+            </tab>
+            <tab heading="Edit Photos">
+                <p>Photo edit will go here</p>
+            </tab>
+        </tabset>
+    </div>
+</div>
