@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WooMeNow.API.Data;
 using WooMeNow.API.Data.Repository;
+using WooMeNow.API.Helpers;
 using WooMeNow.API.Interfaces;
 using WooMeNow.API.Services;
 
@@ -20,6 +21,8 @@ public static class ApplicationServerExtenstions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+        services.AddScoped<IPhotoService, PhotoService>();
 
         return services;
     }
