@@ -1,15 +1,72 @@
-<form #registerForm="ngForm" (ngSubmit)="register()" autocomplete="off">
-    <h1 class="h3 mb-3 fw-normal">Please Sign up</h1>
+<form [formGroup]="registerForm" (ngSubmit)="registerForm.valid && register()" autocomplete="off">
+  <h1 class="h3 mb-3 fw-normal">Sign up</h1>
+  <app-text-input
+    [formControl]="$any(registerForm.controls['username'])"
+    [label]="'Username'"
+  ></app-text-input>
+  <div class="mb-3">
+    <label style="margin-right: 10px">I am a: </label>
+    <label class="form-check-label">
+      <input
+        type="radio"
+        class="form-check-input"
+        value="male"
+        formControlName="gender"
+      />
+      Male
+    </label>
+    <label class="form-check-label">
+      <input
+        type="radio"
+        class="form-check-input ms-1"
+        value="female"
+        formControlName="gender"
+      />
+      Female
+    </label>
+  </div>
+  <app-text-input
+    [formControl]="$any(registerForm.controls['knownAs'])"
+    [label]="'Knows As'"
+  ></app-text-input>
+  <app-date-picker
+    [formControl]="$any(registerForm.controls['dateOfBirth'])"
+    [label]="'Date of Birth'"
+    [maxDate]="maxDate"
+  ></app-date-picker>
+  <app-text-input
+    [formControl]="$any(registerForm.controls['city'])"
+    [label]="'City'"
+  ></app-text-input>
+  <app-text-input
+    [formControl]="$any(registerForm.controls['country'])"
+    [label]="'Country'"
+  ></app-text-input>
+  <hr />
+  <app-text-input
+    [formControl]="$any(registerForm.controls['password'])"
+    [label]="'Password'"
+    [type]="'password'"
+  ></app-text-input>
+  <app-text-input
+    [formControl]="$any(registerForm.controls['confirmPassword'])"
+    [label]="'Confirm password'"
+    [type]="'password'"
+  ></app-text-input>
 
-    <div class="form-floating mb-3">
-      <input type="text" class="form-control" name="name" [(ngModel)]="model.username" placeholder="Username">
-      <label for="floatingInput">Username</label>
-    </div>
-    <div class="form-floating mb-3">
-      <input type="password" class="form-control" name="password" [(ngModel)]="model.password" placeholder="Password">
-      <label for="floatingPassword">Password</label>
-    </div>
-    <button class="btn btn-primary w-100 py-2 mb-1" type="submit">Register</button>
-    <button class="btn btn-secondary w-100 py-2 " type="button" (click)="cancel()">Cancel</button>
-    <p class="mt-5 mb-3 text-body-secondary">© 2023</p>
+  <div class="row" *ngIf="validationErrors">
+    <ul class="text-danger">
+      <li *ngFor="let error of validationErrors">
+        {{ error }}
+      </li>
+    </ul>
+  </div>
+
+  <button [disabled]="!registerForm.valid" class="btn btn-primary w-100 py-2 mb-1" type="submit">
+    Register
+  </button>
+  <button class="btn btn-secondary w-100 py-2" type="button" (click)="cancel()">
+    Cancel
+  </button>
+  <p class="mt-5 mb-3 text-body-secondary">© 2023</p>
 </form>

@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System.ComponentModel.DataAnnotations;
-using WooMeNow.API.Extensions;
-
-namespace WooMeNow.API.Models;
+﻿namespace WooMeNow.API.Models;
 
 public class User
 {

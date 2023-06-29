@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,12 +14,13 @@ public class AccountController : BaseApiController
 {
     private readonly ApplicationDbContext _db;
     private readonly ITokenService _tokenService;
+    private readonly IMapper _mapper;
 
-    public AccountController(ApplicationDbContext db, ITokenService tokenService)
+    public AccountController(ApplicationDbContext db, ITokenService tokenService, IMapper mapper)
     {
         _db = db;
         _tokenService = tokenService;
-
+        _mapper = mapper;
     }
 
     [HttpPost]
@@ -29,12 +31,11 @@ public class AccountController : BaseApiController
 
         using var hmac = new HMACSHA512();
 
-        var user = new User()
-        {
-            UserName = registerDto.Username.ToLower(),
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-            PasswordSalt = hmac.Key
-        };
+        var user = _mapper.Map<User>(registerDto);
+
+        user.UserName = registerDto.Username.ToLower();
+        user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
+        user.PasswordSalt = hmac.Key;
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
@@ -43,7 +44,8 @@ public class AccountController : BaseApiController
         {
             Username = user.UserName,
             Token = _tokenService.CreateToken(user),
-            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+            KnowsAs = user.KnownAs
         };
     }
 
@@ -68,7 +70,8 @@ public class AccountController : BaseApiController
         {
             Username = user.UserName,
             Token = _tokenService.CreateToken(user),
-            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+            KnowsAs = user.KnownAs
         };
     }
 
