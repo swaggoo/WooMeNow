@@ -6,6 +6,7 @@ using System.Security.Claims;
 using WooMeNow.API.Data;
 using WooMeNow.API.Data.Repository;
 using WooMeNow.API.Extensions;
+using WooMeNow.API.Helpers;
 using WooMeNow.API.Interfaces;
 using WooMeNow.API.Models;
 using WooMeNow.API.Models.DTOs;
@@ -28,9 +29,23 @@ public class UsersController : BaseApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+    public async Task<ActionResult<PagedList<MemberDto>>> GetUsers(
+        [FromQuery]UserParams userParams)
     {
-        return Ok(await _userRepository.GetMembersAsync());
+        var currentUser = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+        userParams.CurrentUsername = currentUser.UserName;
+
+        if (string.IsNullOrEmpty(userParams.Gender))
+        {
+            userParams.Gender = currentUser.Gender == "male" ? "female" : "male";
+        }
+
+        var users = await _userRepository.GetMembersAsync(userParams);
+
+        Response.AddPaginationHeader(new PaginationHeader(users.CurrentPage, users.PageSize,
+            users.TotalCount, users.TotalPages));
+
+        return Ok(users);
     }
 
     [HttpGet("{username}")]

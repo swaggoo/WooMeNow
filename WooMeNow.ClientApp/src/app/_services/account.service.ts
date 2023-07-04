@@ -22,6 +22,7 @@ export class AccountService {
         if(user) {
           this.rememberUser(user);
         }
+        return user;
       })
     )
   }
@@ -38,6 +39,7 @@ export class AccountService {
 
   rememberUser(user: User) {
     localStorage.setItem('user', JSON.stringify(user));
+    console.log(user);
     this.currentUserSource.next(user);
   }
 
