@@ -8,6 +8,6 @@ namespace WooMeNow.API.Data.Repository.IRepository
     {
         Task<UserLike> GetUserLike(int sourceUserId, int targetUserId);
         Task<User> GetUserWithLikes(int userId);
-        Task<IEnumerable<LikeDto>> GetUserLikes(LikesParams likesParams);
+        Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams);
     }
 }

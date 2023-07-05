@@ -6,6 +6,7 @@
       <ng-container *ngIf="accountService.currentUser$ | async">
         <li class="nav-item">
           <a class="nav-link" routerLink="/members" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}"
             >Matches</a
           >
         </li>

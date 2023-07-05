@@ -1,0 +1,8 @@
+.img-circle {
+    max-height: 50px;
+}
+
+.bdr {
+    border-radius: 6px;
+    overflow: hidden;
+  }
