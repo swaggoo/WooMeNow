@@ -1,13 +1,10 @@
-﻿using System.Collections.Specialized;
+﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Specialized;
 
 namespace WooMeNow.API.Models;
 
-public class User
+public class User : IdentityUser<int>
 {
-    public int Id { get; set; }
-    public string UserName { get; set; }
-    public byte[] PasswordHash { get; set; }
-    public byte[] PasswordSalt { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public string KnownAs { get; set; }
     public DateTime Created { get; set; } = DateTime.UtcNow;
@@ -24,9 +21,5 @@ public class User
     public List<UserLike> LikedUsers { get; set; }
     public List<Message> MessagesSent { get; set; }
     public List<Message> MessagesReceived { get; set; }
-
-    //public int GetAge()
-    //{
-    //    return DateOfBirth.CalculateAge();
-    //}
+    public ICollection<UserRole> UserRoles { get; set; }
 }

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WooMeNow.API.Data;
 using WooMeNow.API.Extensions;
 using WooMeNow.API.Middleware;
+using WooMeNow.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +34,10 @@ var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<ApplicationDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<Role>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedUsers(context);
+    await Seed.SeedUsers(userManager, roleManager);
 }
 catch (Exception ex)
 {
