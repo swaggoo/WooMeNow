@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WooMeNow.API.Data.Repository.IRepository;
+using WooMeNow.API.Entities;
 using WooMeNow.API.Helpers;
 using WooMeNow.API.Models;
 using WooMeNow.API.Models.DTOs;
@@ -53,12 +54,12 @@ public class MessageRepository : IMessageRepository
             .CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
     }
 
-    public async Task<Message> GetMessage(int id)
+    public async Task<Message> GetMessageAsync(int id)
     {
         return await _db.Messages.FindAsync(id);
     }
 
-    public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUserName, string recipientUserName)
+    public async Task<IEnumerable<MessageDto>> GetMessageThreadAsync(string currentUserName, string recipientUserName)
     {
         var messages = await _db.Messages
             .Include(message => message.Sender).ThenInclude(user => user.Photos)
@@ -91,5 +92,35 @@ public class MessageRepository : IMessageRepository
     public async Task<bool> SaveAllAsync()
     {
         return await _db.SaveChangesAsync() > 0;
+    }
+
+    public void AddGroup(Group group)
+    {
+        _db.Groups.Add(group);
+    }
+
+    public void RemoveConnection(Connection connection)
+    {
+        _db.Connections.Remove(connection);
+    }
+
+    public async Task<Connection> GetConnectionAsync(string connectionId)
+    {
+        return await _db.Connections.FindAsync(connectionId);
+    }
+
+    public async Task<Group> GetMessageGroupAsync(string groupName)
+    {
+        return await _db.Groups
+            .Include(x => x.Connections)
+            .FirstOrDefaultAsync(x => x.Name == groupName);
+    }
+
+    public async Task<Group> GetGroupForConnection(string connectionId)
+    {
+        return await _db.Groups
+            .Include(x => x.Connections)
+            .Where(x => x.Connections.Any(c => c.ConnectionId == connectionId))
+            .FirstOrDefaultAsync();
     }
 }

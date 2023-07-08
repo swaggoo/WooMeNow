@@ -78,7 +78,7 @@ namespace WooMeNow.API.Controllers
         {
             var currentUsername = User.GetUsername();
 
-            return Ok(await _messageRepository.GetMessageThread(currentUsername, username));
+            return Ok(await _messageRepository.GetMessageThreadAsync(currentUsername, username));
         }
 
         [HttpDelete("{id}")]
@@ -86,7 +86,7 @@ namespace WooMeNow.API.Controllers
         {
             var username = User.GetUsername();
 
-            var message = await _messageRepository.GetMessage(id);
+            var message = await _messageRepository.GetMessageAsync(id);
 
             if (message.SenderUsername != username && message.RecipientUsername != username)
                 return Unauthorized();

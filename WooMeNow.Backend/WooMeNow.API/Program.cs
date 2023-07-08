@@ -4,6 +4,7 @@ using WooMeNow.API.Data;
 using WooMeNow.API.Extensions;
 using WooMeNow.API.Middleware;
 using WooMeNow.API.Models;
+using WooMeNow.API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,10 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(policyBuilder =>
 {
-    policyBuilder.AllowAnyHeader()
+    policyBuilder
+    .AllowAnyHeader()
     .AllowAnyMethod()
+    .AllowCredentials()
     .WithOrigins("https://localhost:4200");
 });
 
@@ -28,6 +31,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -37,6 +42,7 @@ try
     var userManager = services.GetRequiredService<UserManager<User>>();
     var roleManager = services.GetRequiredService<RoleManager<Role>>();
     await context.Database.MigrateAsync();
+    await context.Database.ExecuteSqlRawAsync("DELETE FROM [Connections]");
     await Seed.SeedUsers(userManager, roleManager);
 }
 catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using WooMeNow.API.Entities;
 using WooMeNow.API.Models;
 
 namespace WooMeNow.API.Data;
@@ -10,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, int, IdentityU
 {
     public DbSet<UserLike> Likes { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<Connection> Connections { get; set; }
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

@@ -17,12 +17,12 @@ namespace WooMeNow.API.Data.Repository
         }
 
 
-        public async Task<UserLike> GetUserLike(int sourceUserId, int targetUserId)
+        public async Task<UserLike> GetUserLikeAsync(int sourceUserId, int targetUserId)
         {
             return await _db.Likes.FindAsync(sourceUserId, targetUserId);
         }
 
-        public async Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams)
+        public async Task<PagedList<LikeDto>> GetUserLikesAsync(LikesParams likesParams)
         {
             var users = _db.Users.OrderBy(user => user.UserName).AsQueryable();
             var likes = _db.Likes.AsQueryable();
@@ -53,7 +53,7 @@ namespace WooMeNow.API.Data.Repository
 
         }
 
-        public async Task<User> GetUserWithLikes(int userId)
+        public async Task<User> GetUserWithLikesAsync(int userId)
         {
             return await _db.Users
                 .Include(user => user.LikedUsers)

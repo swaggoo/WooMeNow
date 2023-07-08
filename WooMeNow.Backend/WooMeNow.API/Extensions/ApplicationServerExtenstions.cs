@@ -5,6 +5,7 @@ using WooMeNow.API.Data.Repository.IRepository;
 using WooMeNow.API.Helpers;
 using WooMeNow.API.Interfaces;
 using WooMeNow.API.Services;
+using WooMeNow.API.SignalR;
 
 namespace WooMeNow.API.Extensions;
 
@@ -27,6 +28,9 @@ public static class ApplicationServerExtenstions
         services.AddScoped<LogUserActivity>();
         services.AddScoped<ILikesRepository, LikesRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddSignalR();
+        services.AddSingleton<PresenceTracker>();
+
         return services;
     }
 }

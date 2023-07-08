@@ -27,13 +27,13 @@ public class LikesController : BaseApiController
     {
         var sourceUserId = User.GetUserId();
         var likedUser = await _userRepository.GetUserByUsernameAsync(username);
-        var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
+        var sourceUser = await _likesRepository.GetUserWithLikesAsync(sourceUserId);
 
         if (likedUser == null) return NotFound();
 
         if (sourceUser.UserName == username) return BadRequest("You cannot like yourself");
 
-        var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+        var userLike = await _likesRepository.GetUserLikeAsync(sourceUserId, likedUser.Id);
 
         if (userLike != null) return BadRequest("You already liked this user");
 
@@ -54,7 +54,7 @@ public class LikesController : BaseApiController
     public async Task<ActionResult<PagedList<UserLike>>> GetUserLikes([FromQuery] LikesParams likesParams)
     {
         likesParams.UserId = User.GetUserId();
-        var users = await _likesRepository.GetUserLikes(likesParams);
+        var users = await _likesRepository.GetUserLikesAsync(likesParams);
 
         Response.AddPaginationHeader(new PaginationHeader(
             users.CurrentPage, 
