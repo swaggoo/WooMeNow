@@ -9,23 +9,23 @@ namespace WooMeNow.API.Data.Repository
 {
     public class LikesRepository : ILikesRepository
     {
-        private readonly ApplicationDbContext _db;
+        private readonly ApplicationDbContext _context;
 
-        public LikesRepository(ApplicationDbContext db) 
+        public LikesRepository(ApplicationDbContext context) 
         {
-            _db = db;
+            _context = context;
         }
 
 
         public async Task<UserLike> GetUserLikeAsync(int sourceUserId, int targetUserId)
         {
-            return await _db.Likes.FindAsync(sourceUserId, targetUserId);
+            return await _context.Likes.FindAsync(sourceUserId, targetUserId);
         }
 
         public async Task<PagedList<LikeDto>> GetUserLikesAsync(LikesParams likesParams)
         {
-            var users = _db.Users.OrderBy(user => user.UserName).AsQueryable();
-            var likes = _db.Likes.AsQueryable();
+            var users = _context.Users.OrderBy(user => user.UserName).AsQueryable();
+            var likes = _context.Likes.AsQueryable();
 
             if (likesParams.Predicate == "liked")
             {
@@ -49,13 +49,13 @@ namespace WooMeNow.API.Data.Repository
                 City = user.City
             });
 
-            return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageSize, likesParams.PageSize);
+            return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageNumber, likesParams.PageSize);
 
         }
 
         public async Task<User> GetUserWithLikesAsync(int userId)
         {
-            return await _db.Users
+            return await _context.Users
                 .Include(user => user.LikedUsers)
                 .FirstOrDefaultAsync(user => user.Id == userId);
         }

@@ -1,12 +1,17 @@
 <div class="card">
-  <div class="card-body">
+  <div class="card-body" style="padding-bottom: 0px;">
     <div *ngIf="(messageService.messageThread$ | async)?.length === 0">No massages yet... Say hi!</div>
 
-    <ul *ngIf="(messageService.messageThread$ | async)!.length > 0" class="chat">
+    <ul
+      #scrollMe
+      style="overflow: scroll; height: 500px; overflow-x: clip;"
+      [scrollTop]="scrollMe.scrollHeight"
+      *ngIf="(messageService.messageThread$ | async)!.length > 0" class="chat"
+      class="chat custom-scrollbar">
       <li *ngFor="let message of (messageService.messageThread$ | async)">
         <span class="chat-img float-end">
           <img
-            class="rounded-circle"
+            class="rounded-circle pe-2"
             src="{{ message.senderPhotoUrl || './assets/user.jpg' }}"
             alt="user photo"
           />

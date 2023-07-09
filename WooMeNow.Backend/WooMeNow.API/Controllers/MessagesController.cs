@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WooMeNow.API.Data.Repository;
 using WooMeNow.API.Data.Repository.IRepository;
+using WooMeNow.API.Data.UnitOfWork;
 using WooMeNow.API.Extensions;
 using WooMeNow.API.Helpers;
 using WooMeNow.API.Models;
@@ -11,17 +12,14 @@ namespace WooMeNow.API.Controllers
 {
     public class MessagesController : BaseApiController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IMessageRepository _messageRepository;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
         public MessagesController(
-            IUserRepository userRepository, 
-            IMessageRepository messageRepository, 
+            IUnitOfWork uow,
             IMapper mapper) 
         {
-            _userRepository = userRepository;
-            _messageRepository = messageRepository;
+            _uow = uow;
             _mapper = mapper;
         }
 
@@ -33,8 +31,8 @@ namespace WooMeNow.API.Controllers
             if (username == createMessageDto.RecipientUsername) 
                 return BadRequest("You cannot sent message to yourserf");
 
-            var sender = await _userRepository.GetUserByUsernameAsync(username);
-            var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+            var sender = await _uow.UserRepository.GetUserByUsernameAsync(username);
+            var recipient = await _uow.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
 
             if (recipient == null) return NotFound();
 
@@ -47,9 +45,9 @@ namespace WooMeNow.API.Controllers
                 Content = createMessageDto.Content
             };
 
-            _messageRepository.AddMessage(message);
+            _uow.MessageRepository.AddMessage(message);
 
-            if (await _messageRepository.SaveAllAsync()) 
+            if (await _uow.CompleteAsync()) 
                 return Ok(_mapper.Map<MessageDto>(message));
 
             return BadRequest("Failed to send message");
@@ -62,7 +60,7 @@ namespace WooMeNow.API.Controllers
             var username = User.GetUsername();
             messageParams.Username = username;
 
-            var messages = await _messageRepository.GetMessagesForUserAsync(messageParams);
+            var messages = await _uow.MessageRepository.GetMessagesForUserAsync(messageParams);
 
             Response.AddPaginationHeader(new PaginationHeader(
                 messages.CurrentPage, 
@@ -73,20 +71,12 @@ namespace WooMeNow.API.Controllers
             return messages;
         }
 
-        [HttpGet("thread/{username}")]
-        public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string username)
-        {
-            var currentUsername = User.GetUsername();
-
-            return Ok(await _messageRepository.GetMessageThreadAsync(currentUsername, username));
-        }
-
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMessage(int id)
         {
             var username = User.GetUsername();
 
-            var message = await _messageRepository.GetMessageAsync(id);
+            var message = await _uow.MessageRepository.GetMessageAsync(id);
 
             if (message.SenderUsername != username && message.RecipientUsername != username)
                 return Unauthorized();
@@ -97,10 +87,10 @@ namespace WooMeNow.API.Controllers
 
             if(message.SenderDeleted && message.RecipientDeleted)
             {
-                _messageRepository.DeleteMessage(message);
+                _uow.MessageRepository.DeleteMessage(message);
             }
 
-            if (await _messageRepository.SaveAllAsync()) return Ok();
+            if (await _uow.CompleteAsync()) return Ok();
 
             return BadRequest("Problem deleting the message");
 

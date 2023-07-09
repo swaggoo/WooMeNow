@@ -2,6 +2,7 @@
 using WooMeNow.API.Data;
 using WooMeNow.API.Data.Repository;
 using WooMeNow.API.Data.Repository.IRepository;
+using WooMeNow.API.Data.UnitOfWork;
 using WooMeNow.API.Helpers;
 using WooMeNow.API.Interfaces;
 using WooMeNow.API.Services;
@@ -21,13 +22,11 @@ public static class ApplicationServerExtenstions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<LogUserActivity>();
-        services.AddScoped<ILikesRepository, LikesRepository>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddSignalR();
         services.AddSingleton<PresenceTracker>();
 

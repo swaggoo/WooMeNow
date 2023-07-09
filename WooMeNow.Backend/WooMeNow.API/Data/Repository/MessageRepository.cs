@@ -11,30 +11,30 @@ namespace WooMeNow.API.Data.Repository;
 
 public class MessageRepository : IMessageRepository
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
     public MessageRepository(
-        ApplicationDbContext db,
+        ApplicationDbContext context,
         IMapper mapper)
     {
-        _db = db;
+        _context = context;
         _mapper = mapper;
     }
 
     public void AddMessage(Message message)
     {
-        _db.Messages.Add(message);
+        _context.Messages.Add(message);
     }
 
     public void DeleteMessage(Message message)
     {
-        _db.Messages.Remove(message);
+        _context.Messages.Remove(message);
     }
 
     public async Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams)
     {
-        var query = _db.Messages.OrderByDescending(m => m.MessageSent).AsQueryable();
+        var query = _context.Messages.OrderByDescending(m => m.MessageSent).AsQueryable();
 
         query = messageParams.Container switch
         {
@@ -56,24 +56,22 @@ public class MessageRepository : IMessageRepository
 
     public async Task<Message> GetMessageAsync(int id)
     {
-        return await _db.Messages.FindAsync(id);
+        return await _context.Messages.FindAsync(id);
     }
 
     public async Task<IEnumerable<MessageDto>> GetMessageThreadAsync(string currentUserName, string recipientUserName)
     {
-        var messages = await _db.Messages
-            .Include(message => message.Sender).ThenInclude(user => user.Photos)
-            .Include(message => message.Recipient).ThenInclude(user => user.Photos)
+        var query = _context.Messages
             .Where(message => message.SenderUsername == currentUserName &&
-                        !message.RecipientDeleted &&    
+                        !message.RecipientDeleted &&
                         message.RecipientUsername == recipientUserName ||
                         message.RecipientUsername == currentUserName &&
                         !message.SenderDeleted &&
                         message.SenderUsername == recipientUserName)
             .OrderBy(m => m.MessageSent)
-            .ToListAsync();
+            .AsQueryable();
 
-        var unreadMessages = messages.Where(message => message.DateRead == null && 
+        var unreadMessages = query.Where(message => message.DateRead == null && 
             message.RecipientUsername == currentUserName).ToList();
 
         if (unreadMessages.Any())
@@ -82,43 +80,36 @@ public class MessageRepository : IMessageRepository
             {
                 message.DateRead = DateTime.UtcNow;
             }
-
-            await _db.SaveChangesAsync();
         }
 
-        return _mapper.Map<IEnumerable<MessageDto>>(messages);
-    }
-
-    public async Task<bool> SaveAllAsync()
-    {
-        return await _db.SaveChangesAsync() > 0;
+        return await query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     public void AddGroup(Group group)
     {
-        _db.Groups.Add(group);
+        _context.Groups.Add(group);
     }
 
     public void RemoveConnection(Connection connection)
     {
-        _db.Connections.Remove(connection);
+        _context.Connections.Remove(connection);
     }
 
     public async Task<Connection> GetConnectionAsync(string connectionId)
     {
-        return await _db.Connections.FindAsync(connectionId);
+        return await _context.Connections.FindAsync(connectionId);
     }
 
     public async Task<Group> GetMessageGroupAsync(string groupName)
     {
-        return await _db.Groups
+        return await _context.Groups
             .Include(x => x.Connections)
             .FirstOrDefaultAsync(x => x.Name == groupName);
     }
 
     public async Task<Group> GetGroupForConnection(string connectionId)
     {
-        return await _db.Groups
+        return await _context.Groups
             .Include(x => x.Connections)
             .Where(x => x.Connections.Any(c => c.ConnectionId == connectionId))
             .FirstOrDefaultAsync();

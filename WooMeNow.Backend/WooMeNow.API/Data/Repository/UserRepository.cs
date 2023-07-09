@@ -9,18 +9,18 @@ namespace WooMeNow.API.Data.Repository;
 
 public class UserRepository : IUserRepository
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public UserRepository(ApplicationDbContext db, IMapper mapper)
+    public UserRepository(ApplicationDbContext context, IMapper mapper)
     {
-        _db = db;
+        _context = context;
         _mapper = mapper;
     }
 
     public async Task<MemberDto> GetMemberAsync(string username)
     {
-        return await _db.Users
+        return await _context.Users
             .Where(u => u.UserName == username)
             .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
@@ -28,7 +28,7 @@ public class UserRepository : IUserRepository
 
     public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
     {
-        var query = _db.Users.AsQueryable();
+        var query = _context.Users.AsQueryable();
 
         query = query.Where(u => u.UserName != userParams.CurrentUsername);
         query = query.Where(u => u.Gender == userParams.Gender);
@@ -53,30 +53,32 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetUserByIdAsync(int id)
     {
-        return await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User> GetUserByUsernameAsync(string username)
     {
-        return await _db.Users
+        return await _context.Users
             .Include(p => p.Photos)
             .FirstOrDefaultAsync(user => user.UserName == username);
     }
 
+    public async Task<string> GetUserGenderAsync(string username)
+    {
+        return _context.Users
+            .Where(x => x.UserName == username)
+            .Select(x => x.Gender).FirstOrDefault();
+    }
+
     public async Task<IEnumerable<User>> GetUsersAsync()
     {
-        return await _db.Users
+        return await _context.Users
             .Include(p => p.Photos)
             .ToListAsync();
     }
 
-    public async Task<bool> SaveAllAsync()
-    {
-        return await _db.SaveChangesAsync() > 0;
-    }
-
     public void Update(User user)
     {
-        _db.Entry(user).State = EntityState.Modified;
+        _context.Entry(user).State = EntityState.Modified;
     }
 }
