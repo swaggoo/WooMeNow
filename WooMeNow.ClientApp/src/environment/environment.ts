@@ -1,5 +1,5 @@
 export const environment =  {
     production: false,
-    apiUrl: 'https://localhost:44308/api/',
-    hubUrl: 'https://localhost:44308/hubs/'
+    apiUrl: 'http://localhost:8080/api/',
+    hubUrl: 'http://localhost:8080/hubs/'
 };

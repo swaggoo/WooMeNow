@@ -96,8 +96,10 @@ public class MessageHub : Hub
         {
             await Clients.Group(groupName).SendAsync("NewMessage", _mapper.Map<MessageDto>(message));
         }
-
-        throw new HubException("Failed to send message");
+        else
+        {
+            throw new HubException("Failed to send message");
+        }
     }
 
     private string GetGroupName(string caller, string other)

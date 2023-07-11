@@ -1,0 +1,33 @@
+version: "3.9"
+networks:
+  woomenow-dev:
+    driver: bridge
+services:
+
+  app:
+    container_name: woomenow-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - woomenow-dev
+    depends_on:
+      - postgres_db
+
+  postgres_db:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=woomenow
+    ports:
+      - "5432:5432"
+    networks:
+      - woomenow-dev
+    volumes:
+      - postgres-data:/var/liv/postgresql/data/
+volumes:
+  postgres-data:
