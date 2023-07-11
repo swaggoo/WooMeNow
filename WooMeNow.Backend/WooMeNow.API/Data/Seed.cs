@@ -7,6 +7,12 @@ namespace WooMeNow.API.Data;
 
 public class Seed
 {
+    public static async Task ClearConnections(ApplicationDbContext context)
+    {
+        context.Connections.RemoveRange(context.Connections);
+        await context.SaveChangesAsync();
+    }
+
     public static async Task SeedUsers(UserManager<User> userManager, RoleManager<Role> roleManager)
     {
         if (await userManager.Users.AnyAsync()) return;
@@ -32,6 +38,8 @@ public class Seed
         foreach(var user in users)
         {
             user.UserName = user.UserName.ToLower();
+            user.Created = DateTime.SpecifyKind(user.Created, DateTimeKind.Utc);
+            user.LastActive = DateTime.SpecifyKind(user.LastActive, DateTimeKind.Utc);
             await userManager.CreateAsync(user, "Pa$$w0rd");
             await userManager.AddToRoleAsync(user, "Member");
         }

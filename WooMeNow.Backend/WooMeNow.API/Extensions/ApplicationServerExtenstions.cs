@@ -17,7 +17,7 @@ public static class ApplicationServerExtenstions
     {
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlite(config.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(config.GetConnectionString("DefaultConnection"));
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
